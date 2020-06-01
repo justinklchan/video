@@ -29,6 +29,10 @@ import android.content.res.Configuration;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -71,7 +75,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class Camera2VideoFragment extends Fragment
-        implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback {
+        implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback, SensorEventListener {
 
     private static final int SENSOR_ORIENTATION_DEFAULT_DEGREES = 90;
     private static final int SENSOR_ORIENTATION_INVERSE_DEGREES = 270;
@@ -229,6 +233,7 @@ public class Camera2VideoFragment extends Fragment
     public static Camera2VideoFragment newInstance() {
         return new Camera2VideoFragment();
     }
+    TextView angleView;
 
     /**
      * In this sample, we choose a video size with 3x4 aspect ratio. Also, we don't use sizes
@@ -292,6 +297,7 @@ public class Camera2VideoFragment extends Fragment
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+        angleView = (TextView) view.findViewById(R.id.vibe2);
         sw1 = (Switch) view.findViewById(R.id.switch1);
         mButtonVideo = (Button) view.findViewById(R.id.video);
         tv1 = (TextView) view.findViewById(R.id.textView);
@@ -301,6 +307,10 @@ public class Camera2VideoFragment extends Fragment
         view.findViewById(R.id.vibe2).setOnClickListener(this);
         view.findViewById(R.id.stop).setOnClickListener(this);
 //        view.findViewById(R.id.flash).setOnClickListener(this);
+
+        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        mRot = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        mSensorManager.registerListener(this, mRot, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     @Override
@@ -646,14 +656,14 @@ public class Camera2VideoFragment extends Fragment
         }
 //        mMediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED;
         mMediaRecorder.setOutputFile(mNextVideoAbsolutePath);
-        mMediaRecorder.setVideoEncodingBitRate(10000000);
-        mMediaRecorder.setVideoFrameRate(60);
+        mMediaRecorder.setVideoEncodingBitRate(5000000);
+        mMediaRecorder.setVideoFrameRate(30);
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
 
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        mMediaRecorder.setAudioSamplingRate(48000);
-        mMediaRecorder.setAudioEncodingBitRate(96000);
+        mMediaRecorder.setAudioSamplingRate(24000);
+        mMediaRecorder.setAudioEncodingBitRate(64000);
 
         mMediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
             @Override
@@ -716,7 +726,8 @@ public class Camera2VideoFragment extends Fragment
             texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
             mPreviewBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
             buildRequest();
-
+            mPreviewBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_OFF);
+//            mPreviewBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, 0f);
             List<Surface> surfaces = new ArrayList<>();
 
             // Set up Surface for the camera preview
@@ -787,6 +798,47 @@ public class Camera2VideoFragment extends Fragment
         }
         mNextVideoAbsolutePath = null;
         startPreview();
+    }
+
+    private SensorManager mSensorManager;
+    Sensor mRot;
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        SensorManager.getRotationMatrixFromVector(
+                mRotationMatrix, event.values);
+
+        // side to side
+        SensorManager.remapCoordinateSystem(mRotationMatrix,
+                SensorManager.AXIS_X,
+                SensorManager.AXIS_Y,
+                mRotationMatrixOut1);
+        float[] orientation1 = new float[3];
+        SensorManager.getOrientation(mRotationMatrixOut1, orientation1);
+        convertToDegrees(orientation1);
+        int sidetoside = (int)orientation1[2];
+
+        SensorManager.remapCoordinateSystem(mRotationMatrix,
+                SensorManager.AXIS_Y,
+                SensorManager.AXIS_MINUS_X,
+                mRotationMatrixOut1);
+        SensorManager.getOrientation(mRotationMatrixOut1, orientation1);
+        convertToDegrees(orientation1);
+        int updown = (int)orientation1[2];
+
+        angleView.setText(sidetoside+"° "+updown + "°");
+    }
+
+    private void convertToDegrees(float[] vector) {
+        for (int i = 0; i < vector.length; i++) {
+            vector[i] = Math.round(Math.toDegrees(vector[i]));
+        }
+    }
+    float[] mRotationMatrix = new float[16];
+    float[] mRotationMatrixOut1 = new float[16];
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
     /**
