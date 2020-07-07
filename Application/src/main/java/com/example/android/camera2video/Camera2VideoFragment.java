@@ -24,8 +24,12 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -42,15 +46,19 @@ import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.legacy.app.FragmentCompat;
 import androidx.core.app.ActivityCompat;
 
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -61,15 +69,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -115,6 +128,8 @@ public class Camera2VideoFragment extends Fragment
      * Button to record video
      */
     private Button mButtonVideo;
+
+//    private Button mButtonPic;
 
     /**
      * A reference to the opened {@link android.hardware.camera2.CameraDevice}.
@@ -293,6 +308,9 @@ public class Camera2VideoFragment extends Fragment
     }
 
     TextView tv1;
+    int requestCode;
+    private int grantResults[];
+
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -300,25 +318,159 @@ public class Camera2VideoFragment extends Fragment
         angleView = (TextView) view.findViewById(R.id.vibe2);
         sw1 = (Switch) view.findViewById(R.id.switch1);
         mButtonVideo = (Button) view.findViewById(R.id.video);
+//        mButtonPic = (Button) view.findViewById(R.id.snap);
         tv1 = (TextView) view.findViewById(R.id.textView);
         mButtonVideo.setOnClickListener(this);
-//        view.findViewById(R.id.info).setOnClickListener(this);
+//        mButtonPic.setOnClickListener(this);
         view.findViewById(R.id.vibe).setOnClickListener(this);
         view.findViewById(R.id.vibe2).setOnClickListener(this);
         view.findViewById(R.id.stop).setOnClickListener(this);
-//        view.findViewById(R.id.flash).setOnClickListener(this);
+
+        final View htop = view.findViewById(R.id.htop);
+        final View hbottom = view.findViewById(R.id.hbottom);
+        final View vleft = view.findViewById(R.id.vleft);
+        final View vright = view.findViewById(R.id.vright);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final SharedPreferences.Editor editor = prefs.edit();
+
+        // populate the margins at first
+        ViewGroup.MarginLayoutParams htopParams = (ViewGroup.MarginLayoutParams) htop.getLayoutParams();
+        int hTopMargin = prefs.getInt("htop", htopParams.topMargin);
+        htopParams.setMargins(htopParams.leftMargin, hTopMargin, htopParams.rightMargin, htopParams.bottomMargin);
+
+        ViewGroup.MarginLayoutParams hbottomParams = (ViewGroup.MarginLayoutParams) hbottom.getLayoutParams();
+        int hBottomMargin = prefs.getInt("hbottom", hbottomParams.topMargin);
+        hbottomParams.setMargins(hbottomParams.leftMargin, hBottomMargin, hbottomParams.rightMargin, hbottomParams.bottomMargin);
+
+        ViewGroup.MarginLayoutParams vleftParams = (ViewGroup.MarginLayoutParams) vleft.getLayoutParams();
+        int vleftMargin = prefs.getInt("vleft", vleftParams.leftMargin);
+        vleftParams.setMargins(vleftMargin, vleftParams.topMargin, vleftParams.rightMargin, vleftParams.bottomMargin);
+
+        ViewGroup.MarginLayoutParams vrightParams = (ViewGroup.MarginLayoutParams) vright.getLayoutParams();
+        int vrightMargin = prefs.getInt("vright", vrightParams.leftMargin);
+        vrightParams.setMargins(vrightMargin, vrightParams.topMargin, vrightParams.rightMargin, vrightParams.bottomMargin);
+
+        final int inc = 5;
+
+        // set up the listeners
+        ImageView up1 = view.findViewById(R.id.up1);
+        up1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) htop.getLayoutParams();
+                Log.e("out",params.width+","+params.topMargin);
+                params.setMargins(params.leftMargin, params.topMargin-inc, params.rightMargin, params.bottomMargin);
+
+                editor.putInt("htop", params.topMargin-inc);
+                editor.commit();
+            }
+        });
+        ImageView down1 = view.findViewById(R.id.down1);
+        down1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) htop.getLayoutParams();
+//                Log.e("out",params.width+","+params.topMargin);
+                params.setMargins(params.leftMargin, params.topMargin+inc, params.rightMargin, params.bottomMargin);
+
+                editor.putInt("htop", params.topMargin+inc);
+                editor.commit();
+            }
+        });
+
+        ImageView up2 = view.findViewById(R.id.up2);
+        up2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) hbottom.getLayoutParams();
+//                Log.e("out",params.width+","+params.topMargin);
+                params.setMargins(params.leftMargin, params.topMargin-inc, params.rightMargin, params.bottomMargin);
+
+                editor.putInt("hbottom", params.topMargin-inc);
+                editor.commit();
+            }
+        });
+        ImageView down2 = view.findViewById(R.id.down2);
+        down2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) hbottom.getLayoutParams();
+//                Log.e("out",params.topMargin);
+                params.setMargins(params.leftMargin, params.topMargin+inc, params.rightMargin, params.bottomMargin);
+
+                editor.putInt("hbottom", params.topMargin+inc);
+                editor.commit();
+            }
+        });
+
+        ImageView left1 = view.findViewById(R.id.left1);
+        left1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) vleft.getLayoutParams();
+//                Log.e("out",params.leftMargin);
+                params.setMargins(params.leftMargin-inc, params.topMargin, params.rightMargin, params.bottomMargin);
+
+                editor.putInt("vleft", params.leftMargin-inc);
+                editor.commit();
+            }
+        });
+        ImageView right1 = view.findViewById(R.id.right1);
+        right1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) vleft.getLayoutParams();
+//                Log.e("out",params.leftMargin);
+                params.setMargins(params.leftMargin+inc, params.topMargin, params.rightMargin, params.bottomMargin);
+
+                editor.putInt("vleft", params.leftMargin+inc);
+                editor.commit();
+            }
+        });
+
+        ImageView left2 = view.findViewById(R.id.left2);
+        left2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) vright.getLayoutParams();
+//                Log.e("out",params.leftMargin);
+                params.setMargins(params.leftMargin-inc, params.topMargin, params.rightMargin, params.bottomMargin);
+
+                editor.putInt("vright", params.leftMargin-inc);
+                editor.commit();
+            }
+        });
+        ImageView right2 = view.findViewById(R.id.right2);
+        right2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) vright.getLayoutParams();
+//                Log.e("out",params.leftMargin);
+                params.setMargins(params.leftMargin+inc, params.topMargin, params.rightMargin, params.bottomMargin);
+
+                editor.putInt("vright", params.leftMargin+inc);
+                editor.commit();
+            }
+        });
 
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         mRot = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
         mSensorManager.registerListener(this, mRot, SensorManager.SENSOR_DELAY_FASTEST);
+
+        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.RECORD_AUDIO},requestCode);
+        onRequestPermissionsResult(requestCode,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.RECORD_AUDIO}, grantResults);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         startBackgroundThread();
-        if (mTextureView.isAvailable()) {
-            openCamera(mTextureView.getWidth(), mTextureView.getHeight());
+        if (mTextureView.isAvailable()) {openCamera(mTextureView.getWidth(), mTextureView.getHeight());
         } else {
             mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
         }
@@ -368,6 +520,11 @@ public class Camera2VideoFragment extends Fragment
                 vv.cancel();
                 break;
             }
+//            case R.id.snap:
+//                Log.e("test","snap");
+//                takescreenshot();
+//                snap();
+//                break;
 //            case R.id.flash: {
 //                Log.e("test","flash "+ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.VIBRATE));
 //                try {
@@ -379,6 +536,65 @@ public class Camera2VideoFragment extends Fragment
 //                break;
 //            }
         }
+    }
+
+    public void snap() {
+        try {
+            CaptureRequest.Builder requestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+
+            SurfaceTexture texture = mTextureView.getSurfaceTexture();
+
+            Surface previewSurface = new Surface(texture);
+            requestBuilder.addTarget(previewSurface);
+
+            // Focus
+            requestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_MACRO);
+
+            // Orientation
+//            int rotation = windowManager.getDefaultDisplay().getRotation();
+//            requestBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
+
+//            mPreviewSession.capture(requestBuilder.build(), camera2Callback, null);
+        }
+        catch(Exception e) {
+            Log.e("err",e.getMessage());
+        }
+    }
+
+    public void takescreenshot() {
+        View v = getActivity().getWindow().getDecorView().getRootView();
+        v.setDrawingCacheEnabled(true);
+        v.buildDrawingCache(true);
+
+        Bitmap bb = v.getDrawingCache();
+        Bitmap bitmap = Bitmap.createBitmap(bb);
+        v.setDrawingCacheEnabled(false);
+
+        String out = MediaStore.Images.Media.insertImage(
+                getActivity().getContentResolver(), bitmap, "", "");  // Saves the image.
+
+        String path = convertMediaUriToPath(Uri.parse(out));
+
+        File file = new File(path);
+
+        Uri photoURI = FileProvider.getUriForFile(getContext(),
+                getContext().getPackageName() + ".provider", file);
+
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.setDataAndType(photoURI, "image/*");
+        startActivity(intent);
+    }
+
+    protected String convertMediaUriToPath(Uri uri) {
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getActivity().getContentResolver().query(uri, proj, null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String path = cursor.getString(column_index);
+        cursor.close();
+        return path;
     }
 
     /**
@@ -481,7 +697,8 @@ public class Camera2VideoFragment extends Fragment
         manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
         try {
             Log.d(TAG, "tryAcquire");
-            if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+            mCameraOpenCloseLock.release();
+            if (!mCameraOpenCloseLock.tryAcquire(10000, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
             cameraId = manager.getCameraIdList()[0];
@@ -695,6 +912,8 @@ public class Camera2VideoFragment extends Fragment
     CountUpTimer timer;
 
     private void startRecordingVideo() {
+        ang1 = new LinkedList<>();
+        ang2 = new LinkedList<>();
         if (null == mCameraDevice || !mTextureView.isAvailable() || null == mPreviewSize) {
             return;
         }
@@ -714,6 +933,12 @@ public class Camera2VideoFragment extends Fragment
                     if (tv1!=null) {
                         tv1.setText(tval);
                     }
+                    double minlim=59;
+                    if (second > (60*minlim)) {
+                        stopRecordingVideo();
+                        vv.cancel();
+                    }
+                    Log.e("out",second+"");
 //                    Constants.timerVal = tval;
                 }
             };
@@ -798,6 +1023,32 @@ public class Camera2VideoFragment extends Fragment
         }
         mNextVideoAbsolutePath = null;
         startPreview();
+        writeAngs();
+    }
+
+    public void writeAngs() {
+        try {
+            String dir = getActivity().getExternalFilesDir(null).toString();
+
+            File path = new File(dir);
+            if (!path.exists()) {
+                path.mkdir();
+            }
+
+            File file = new File(dir+File.separator+System.currentTimeMillis()+".txt");
+            if(!file.exists()) {
+                file.createNewFile();
+            }
+            BufferedWriter buf = new BufferedWriter(new FileWriter(file,false));
+            for (int i = 0; i < ang1.size(); i++) {
+                buf.append(ang1.get(i)+","+ang2.get(i));
+                buf.newLine();
+            }
+            buf.flush();
+            buf.close();
+        } catch(Exception e) {
+            Log.e("test",e.getMessage());
+        }
     }
 
     private SensorManager mSensorManager;
@@ -815,7 +1066,10 @@ public class Camera2VideoFragment extends Fragment
         float[] orientation1 = new float[3];
         SensorManager.getOrientation(mRotationMatrixOut1, orientation1);
         convertToDegrees(orientation1);
-        int sidetoside = (int)orientation1[2];
+
+        DecimalFormat format = new DecimalFormat("##.##");
+        String sidetoside = format.format(orientation1[2]);
+        ang1.add(orientation1[2]);
 
         SensorManager.remapCoordinateSystem(mRotationMatrix,
                 SensorManager.AXIS_Y,
@@ -823,14 +1077,18 @@ public class Camera2VideoFragment extends Fragment
                 mRotationMatrixOut1);
         SensorManager.getOrientation(mRotationMatrixOut1, orientation1);
         convertToDegrees(orientation1);
-        int updown = (int)orientation1[2];
+        String updown = format.format(orientation1[2]);
+        ang2.add(orientation1[2]);
 
-        angleView.setText(sidetoside+"° "+updown + "°");
+        angleView.setText(sidetoside+"°\n"+updown + "°");
     }
+
+    LinkedList<Float>ang1 = new LinkedList<>();
+    LinkedList<Float>ang2 = new LinkedList<>();
 
     private void convertToDegrees(float[] vector) {
         for (int i = 0; i < vector.length; i++) {
-            vector[i] = Math.round(Math.toDegrees(vector[i]));
+            vector[i] = (float)Math.toDegrees(vector[i]);
         }
     }
     float[] mRotationMatrix = new float[16];
