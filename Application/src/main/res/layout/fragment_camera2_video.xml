@@ -68,158 +68,173 @@
             android:id="@+id/vibe2"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="7dp"
-            android:layout_marginTop="6dp"
             android:text="vibe2"
-            android:textSize="40sp"
+            android:textSize="30sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/vibe" />
 
-        <Switch
-            android:id="@+id/switch1"
+<!--        <Switch-->
+<!--            android:id="@+id/switch1"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="7dp"-->
+<!--            android:checked="true"-->
+<!--            android:text="flash"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/vibe2" />-->
+
+        <TextView
+            android:id="@+id/timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="7dp"
-            android:checked="true"
-            android:text="flash"
+            android:text="0:00"
+            android:textSize="30sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/vibe2" />
 
+        <!--        <ImageView-->
+<!--            android:id="@+id/up1"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            android:background="@color/colorDarkGreen"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/vibe2"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/stop"-->
+<!--            app:srcCompat="@drawable/ic_baseline_arrow_upward_24" />-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/down1"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_marginTop="5dp"-->
+<!--            android:background="@color/colorDarkGreen"-->
+<!--            app:layout_constraintEnd_toEndOf="@+id/up1"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/up1"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/up1"-->
+<!--            app:srcCompat="@drawable/ic_baseline_arrow_downward_24" />-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/up2"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_marginStart="5dp"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            android:background="@color/colorDarkGreen"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/up1"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/stop"-->
+<!--            app:srcCompat="@drawable/ic_baseline_arrow_upward_24" />-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/down2"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_marginStart="5dp"-->
+<!--            android:layout_marginTop="5dp"-->
+<!--            android:background="@color/colorDarkGreen"-->
+<!--            app:layout_constraintEnd_toEndOf="@+id/up2"-->
+<!--            app:layout_constraintHorizontal_bias="1.0"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/down1"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/up1"-->
+<!--            app:srcCompat="@drawable/ic_baseline_arrow_downward_24" />-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/left1"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_marginStart="5dp"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            android:background="@color/colorDarkGreen"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/up2"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/stop"-->
+<!--            app:srcCompat="@drawable/ic_baseline_arrow_back_24" />-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/right1"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_marginStart="5dp"-->
+<!--            android:background="@color/colorDarkGreen"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/left1"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/left1"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/left1"-->
+<!--            app:srcCompat="@drawable/ic_baseline_arrow_forward_24" />-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/left2"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_marginStart="5dp"-->
+<!--            android:layout_marginTop="5dp"-->
+<!--            android:background="@color/colorDarkGreen"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/up2"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/left1"-->
+<!--            app:srcCompat="@drawable/ic_baseline_arrow_back_24" />-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/right2"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_marginStart="5dp"-->
+<!--            android:layout_marginTop="5dp"-->
+<!--            android:background="@color/colorDarkGreen"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/left2"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/left1"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/left1"-->
+<!--            app:srcCompat="@drawable/ic_baseline_arrow_forward_24" />-->
+
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/rsize"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="7dp"
-            android:text="0:00"
-            android:textSize="40dp"
+            android:text="0"
+            android:textSize="30sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/switch1" />
+            app:layout_constraintTop_toBottomOf="@+id/timer" />
 
         <ImageView
-            android:id="@+id/up1"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/colorDarkGreen"
+            android:id="@+id/preview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/vibe2"
             app:layout_constraintTop_toBottomOf="@+id/stop"
-            app:srcCompat="@drawable/ic_baseline_arrow_upward_24" />
-
-        <ImageView
-            android:id="@+id/down1"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="5dp"
-            android:background="@color/colorDarkGreen"
-            app:layout_constraintEnd_toEndOf="@+id/up1"
-            app:layout_constraintStart_toStartOf="@+id/up1"
-            app:layout_constraintTop_toBottomOf="@+id/up1"
-            app:srcCompat="@drawable/ic_baseline_arrow_downward_24" />
-
-        <ImageView
-            android:id="@+id/up2"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/colorDarkGreen"
-            app:layout_constraintStart_toEndOf="@+id/up1"
-            app:layout_constraintTop_toBottomOf="@+id/stop"
-            app:srcCompat="@drawable/ic_baseline_arrow_upward_24" />
-
-        <ImageView
-            android:id="@+id/down2"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:background="@color/colorDarkGreen"
-            app:layout_constraintEnd_toEndOf="@+id/up2"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/down1"
-            app:layout_constraintTop_toBottomOf="@+id/up1"
-            app:srcCompat="@drawable/ic_baseline_arrow_downward_24" />
-
-        <ImageView
-            android:id="@+id/left1"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/colorDarkGreen"
-            app:layout_constraintStart_toEndOf="@+id/up2"
-            app:layout_constraintTop_toBottomOf="@+id/stop"
-            app:srcCompat="@drawable/ic_baseline_arrow_back_24" />
-
-        <ImageView
-            android:id="@+id/right1"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="5dp"
-            android:background="@color/colorDarkGreen"
-            app:layout_constraintBottom_toBottomOf="@+id/left1"
-            app:layout_constraintStart_toEndOf="@+id/left1"
-            app:layout_constraintTop_toTopOf="@+id/left1"
-            app:srcCompat="@drawable/ic_baseline_arrow_forward_24" />
-
-        <ImageView
-            android:id="@+id/left2"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:background="@color/colorDarkGreen"
-            app:layout_constraintStart_toEndOf="@+id/up2"
-            app:layout_constraintTop_toBottomOf="@+id/left1"
-            app:srcCompat="@drawable/ic_baseline_arrow_back_24" />
-
-        <ImageView
-            android:id="@+id/right2"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:background="@color/colorDarkGreen"
-            app:layout_constraintBottom_toBottomOf="@+id/left2"
-            app:layout_constraintStart_toEndOf="@+id/left1"
-            app:layout_constraintTop_toBottomOf="@+id/left1"
-            app:srcCompat="@drawable/ic_baseline_arrow_forward_24" />
+            app:srcCompat="@drawable/ic_action_info" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <View
-        android:id="@+id/htop"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="135dp"
-        android:background="@color/colorDarkGreen"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--    <View-->
+<!--        android:id="@+id/htop"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:layout_marginTop="135dp"-->
+<!--        android:background="@color/colorDarkGreen"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
-    <View
-        android:id="@+id/hbottom"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="420dp"
-        android:background="@color/colorDarkGreen"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--    <View-->
+<!--        android:id="@+id/hbottom"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:layout_marginTop="420dp"-->
+<!--        android:background="@color/colorDarkGreen"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
-    <View
-        android:id="@+id/vleft"
-        android:layout_width="1dp"
-        android:layout_height="450dp"
-        android:layout_marginStart="50dp"
-        android:background="@color/colorDarkGreen"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--    <View-->
+<!--        android:id="@+id/vleft"-->
+<!--        android:layout_width="1dp"-->
+<!--        android:layout_height="450dp"-->
+<!--        android:layout_marginStart="50dp"-->
+<!--        android:background="@color/colorDarkGreen"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
-    <View
-        android:id="@+id/vright"
-        android:layout_width="1dp"
-        android:layout_height="450dp"
-        android:layout_marginStart="350dp"
-        android:background="@color/colorDarkGreen"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--    <View-->
+<!--        android:id="@+id/vright"-->
+<!--        android:layout_width="1dp"-->
+<!--        android:layout_height="450dp"-->
+<!--        android:layout_marginStart="350dp"-->
+<!--        android:background="@color/colorDarkGreen"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

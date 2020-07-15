@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Application/Application.iml" filepath="$PROJECT_DIR$/Application/Application.iml" group="Camera2VideoJava/Application" />
-      <module fileurl="file://$PROJECT_DIR$/Camera2VideoJava.iml" filepath="$PROJECT_DIR$/Camera2VideoJava.iml" group="Camera2VideoJava" />
+      <module fileurl="file://$PROJECT_DIR$/Application/Application.iml" filepath="$PROJECT_DIR$/Application/Application.iml" group="video/Application" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/video.iml" filepath="$PROJECT_DIR$/.idea/modules/video.iml" group="video" />
     </modules>
   </component>
 </project>
