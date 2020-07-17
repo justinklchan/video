@@ -73,6 +73,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Switch;
@@ -345,6 +346,7 @@ public class Camera2VideoFragment extends Fragment
 
     TextView tv1;
     TextView rsize;
+    CheckBox cb1;
     int requestCode;
     private int grantResults[];
     ImageView preview;
@@ -360,6 +362,7 @@ public class Camera2VideoFragment extends Fragment
 //        mButtonPic = (Button) view.findViewById(R.id.snap);
         tv1 = (TextView) view.findViewById(R.id.timer);
         rsize = (TextView) view.findViewById(R.id.rsize);
+        cb1 = (CheckBox) view.findViewById(R.id.checkBox);
         mButtonVideo.setOnClickListener(this);
 //        mButtonPic.setOnClickListener(this);
         view.findViewById(R.id.vibe).setOnClickListener(this);
@@ -567,7 +570,7 @@ public class Camera2VideoFragment extends Fragment
             case R.id.vibe: {
                 Log.e("test","vibe "+ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.VIBRATE));
 //                vv.vibrate(VibrationEffect.createOneShot(60*1000, 255));
-                vv.vibrate(VibrationEffect.createWaveform(new long[]{1000,4000}, 0));
+                vv.vibrate(VibrationEffect.createWaveform(new long[]{1000,1000}, 0));
                 break;
             }
             case R.id.vibe2: {
@@ -885,52 +888,52 @@ public class Camera2VideoFragment extends Fragment
                                                @NonNull TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
 
-//                    if (!mIsRecordingVideo) {
-//                        mCounter += 1;
-//
-//                        if (mCounter % 30 == 0) {
-//                            getActivity().runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    int rgbi = 220;
-//                                    float rmin = (float) (rgbi / 255.0);
-//                                    float rmax = (float) (255 / 255.0);
-//                                    float gmin = (float) (rgbi / 255.0);
-//                                    float gmax = (float) (255 / 255.0);
-//                                    float bmin = (float) (rgbi / 255.0);
-//                                    float bmax = (float) (255 / 255.0);
-//                                    long start = System.currentTimeMillis();
-//                                    Bitmap bm = mTextureView.getBitmap();
-//                                    int[] pixels = new int[bm.getWidth() * bm.getHeight()];
-//                                    int nw = 500;
-//                                    int nh = 500;
-//                                    int cc = 0;
-//                                    int si = 200;
-//                                    int sj = 450;
-//                                    int rcounter = 0;
-//                                    for (int i = si; i < si + nw; i++) {
-//                                        for (int j = sj; j < sj + nh; j++) {
-//                                            Color c = Color.valueOf(bm.getPixel(i, j));
-//                                            if (c.red() >= rmin && c.red() <= rmax &&
-//                                                    c.green() >= gmin && c.green() <= gmax &&
-//                                                    c.blue() >= bmin && c.blue() <= bmax) {
-//                                                pixels[cc++] = Color.rgb(0, 0, 0);
-//                                                rcounter += 1;
-//                                            } else {
-//                                                //                                            pixels[cc++] = Color.rgb(255,0,0);
-//                                                pixels[cc++] = bm.getPixel(i, j);
-//                                            }
-//                                        }
-//                                    }
-//
-//                                    Bitmap bitmap = Bitmap.createBitmap(pixels, nw, nh, bm.getConfig());
-//                                    preview.setImageBitmap(bitmap);
-//                                    rsize.setText(rcounter + "");
-//                                    Log.e("done", (System.currentTimeMillis() - start) + "");
-//                                }
-//                            });
-//                        }
-//                    }
+                    if (!mIsRecordingVideo && cb1.isChecked()) {
+                        mCounter += 1;
+
+                        if (mCounter % 30 == 0) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    int rgbi = 220;
+                                    float rmin = (float) (rgbi / 255.0);
+                                    float rmax = (float) (255 / 255.0);
+                                    float gmin = (float) (rgbi / 255.0);
+                                    float gmax = (float) (255 / 255.0);
+                                    float bmin = (float) (rgbi / 255.0);
+                                    float bmax = (float) (255 / 255.0);
+                                    long start = System.currentTimeMillis();
+                                    Bitmap bm = mTextureView.getBitmap();
+                                    int[] pixels = new int[bm.getWidth() * bm.getHeight()];
+                                    int nw = 500;
+                                    int nh = 500;
+                                    int cc = 0;
+                                    int si = 200;
+                                    int sj = 450;
+                                    int rcounter = 0;
+                                    for (int i = si; i < si + nw; i++) {
+                                        for (int j = sj; j < sj + nh; j++) {
+                                            Color c = Color.valueOf(bm.getPixel(i, j));
+                                            if (c.red() >= rmin && c.red() <= rmax &&
+                                                    c.green() >= gmin && c.green() <= gmax &&
+                                                    c.blue() >= bmin && c.blue() <= bmax) {
+                                                pixels[cc++] = Color.rgb(0, 0, 0);
+                                                rcounter += 1;
+                                            } else {
+                                                //                                            pixels[cc++] = Color.rgb(255,0,0);
+                                                pixels[cc++] = bm.getPixel(i, j);
+                                            }
+                                        }
+                                    }
+
+                                    Bitmap bitmap = Bitmap.createBitmap(pixels, nw, nh, bm.getConfig());
+                                    preview.setImageBitmap(bitmap);
+                                    rsize.setText(rcounter + "");
+                                    Log.e("done", (System.currentTimeMillis() - start) + "");
+                                }
+                            });
+                        }
+                    }
                 }
             };
 
