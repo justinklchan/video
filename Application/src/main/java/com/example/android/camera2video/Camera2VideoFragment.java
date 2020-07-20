@@ -806,9 +806,15 @@ public class Camera2VideoFragment extends Fragment
 //            mPreviewBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
 //        }
         mPreviewBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_CANCEL);
-        mPreviewBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_MACRO);
         mPreviewBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
-        mPreviewBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, 0f);
+
+        // S9
+//        mPreviewBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_MACRO);
+//        mPreviewBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, 0f);
+
+        // S8
+        mPreviewBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_OFF);
+        mPreviewBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, 100f);
     }
 
     private ImageReader mImageReader;
@@ -946,8 +952,9 @@ public class Camera2VideoFragment extends Fragment
     double mCounter = 0;
 
     private void setUpCaptureRequestBuilder(CaptureRequest.Builder builder) {
-        builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+//        builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
 //        builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_OFF);
+//        builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_AF_MODE_MACRO);
     }
 
     /**
