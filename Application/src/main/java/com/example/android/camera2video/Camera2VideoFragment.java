@@ -901,7 +901,19 @@ public class Camera2VideoFragment extends Fragment
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    //s9
+//                                    int rgbi = 220;
+//                                    int nw = 500;
+//                                    int nh = 500;
+//                                    int si = 200;
+//                                    int sj = 450;
+                                    //s8
                                     int rgbi = 220;
+                                    int nw = 500;
+                                    int nh = 500;
+                                    int si = 700;
+                                    int sj = 650;
+
                                     float rmin = (float) (rgbi / 255.0);
                                     float rmax = (float) (255 / 255.0);
                                     float gmin = (float) (rgbi / 255.0);
@@ -911,11 +923,7 @@ public class Camera2VideoFragment extends Fragment
                                     long start = System.currentTimeMillis();
                                     Bitmap bm = mTextureView.getBitmap();
                                     int[] pixels = new int[bm.getWidth() * bm.getHeight()];
-                                    int nw = 500;
-                                    int nh = 500;
                                     int cc = 0;
-                                    int si = 200;
-                                    int sj = 450;
                                     int rcounter = 0;
                                     for (int i = si; i < si + nw; i++) {
                                         for (int j = sj; j < sj + nh; j++) {
@@ -933,7 +941,8 @@ public class Camera2VideoFragment extends Fragment
                                     }
 
                                     Bitmap bitmap = Bitmap.createBitmap(pixels, nw, nh, bm.getConfig());
-                                    preview.setImageBitmap(bitmap);
+
+                                    preview.setImageBitmap(RotateBitmap(bitmap,180));
                                     rsize.setText(rcounter + "");
                                     Log.e("done", (System.currentTimeMillis() - start) + "");
                                 }
@@ -947,6 +956,12 @@ public class Camera2VideoFragment extends Fragment
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Bitmap RotateBitmap(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
     double mCounter = 0;
