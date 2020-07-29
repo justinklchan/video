@@ -22,6 +22,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -63,6 +64,7 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -71,6 +73,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -350,6 +353,9 @@ public class Camera2VideoFragment extends Fragment
     int requestCode;
     private int grantResults[];
     ImageView preview;
+    private ContentResolver cResolver;
+    private Window window;
+    private int brightness;
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
@@ -369,25 +375,68 @@ public class Camera2VideoFragment extends Fragment
         view.findViewById(R.id.vibe2).setOnClickListener(this);
         view.findViewById(R.id.stop).setOnClickListener(this);
 
-//        seekBar = view.findViewById(R.id.seekBar);
-//        seekBar.setMax(10);
-//        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                Log.e("asdf",progress+"");
-////                mPreviewBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, (float)progress);
-//            }
-//
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//        });
+        if (!Settings.System.canWrite(getActivity())) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+            intent.setData(Uri.parse("package:" + getActivity().getPackageName()));
+            startActivity(intent);
+        }
+
+        //Get the content resolver
+        cResolver = getActivity().getContentResolver();
+
+        //Get the current window
+        window = getActivity().getWindow();
+
+        try {
+            // To handle the auto
+            Settings.System.putInt(cResolver,
+                    Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+            //Get the current system brightness
+            brightness = Settings.System.getInt(cResolver, Settings.System.SCREEN_BRIGHTNESS);
+        }
+        catch (Settings.SettingNotFoundException e) {
+            //Throw an error case it couldn't be retrieved
+            Log.e("Error", "Cannot access system brightness");
+            e.printStackTrace();
+        }
+
+        //Set the system brightness using the brightness variable value
+        Settings.System.putInt(cResolver, Settings.System.SCREEN_BRIGHTNESS, brightness);
+        //Get the current window attributes
+        WindowManager.LayoutParams layoutpars = window.getAttributes();
+        //Set the brightness of this window
+        layoutpars.screenBrightness = 0;
+        //Apply attribute changes to this window
+        window.setAttributes(layoutpars);
+
+        seekBar = view.findViewById(R.id.seekBar);
+        seekBar.setMax(255);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Log.e("asdf",progress+"");
+//                mPreviewBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, (float)progress);
+
+                //Set the system brightness using the brightness variable value
+                Settings.System.putInt(cResolver, Settings.System.SCREEN_BRIGHTNESS, brightness);
+                //Get the current window attributes
+                WindowManager.LayoutParams layoutpars = window.getAttributes();
+                //Set the brightness of this window
+                layoutpars.screenBrightness = progress / (float)255;
+                //Apply attribute changes to this window
+                window.setAttributes(layoutpars);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
 //        final View htop = view.findViewById(R.id.htop);
 //        final View hbottom = view.findViewById(R.id.hbottom);
@@ -902,17 +951,17 @@ public class Camera2VideoFragment extends Fragment
                                 @Override
                                 public void run() {
                                     //s9
-//                                    int rgbi = 220;
-//                                    int nw = 500;
-//                                    int nh = 500;
-//                                    int si = 200;
-//                                    int sj = 450;
-                                    //s8
                                     int rgbi = 220;
                                     int nw = 500;
                                     int nh = 500;
-                                    int si = 700;
-                                    int sj = 650;
+                                    int si = 200;
+                                    int sj = 450;
+                                    //s8
+//                                    int rgbi = 220;
+//                                    int nw = 500;
+//                                    int nh = 500;
+//                                    int si = 700;
+//                                    int sj = 650;
 
                                     float rmin = (float) (rgbi / 255.0);
                                     float rmax = (float) (255 / 255.0);
@@ -942,7 +991,7 @@ public class Camera2VideoFragment extends Fragment
 
                                     Bitmap bitmap = Bitmap.createBitmap(pixels, nw, nh, bm.getConfig());
 
-                                    preview.setImageBitmap(RotateBitmap(bitmap,180));
+                                    preview.setImageBitmap(RotateBitmap(bitmap,0));
                                     rsize.setText(rcounter + "");
                                     Log.e("done", (System.currentTimeMillis() - start) + "");
                                 }
@@ -1083,8 +1132,7 @@ public class Camera2VideoFragment extends Fragment
                     if (tv1!=null) {
                         tv1.setText(tval);
                     }
-                    double minlim=21;
-                    if (second > (60*minlim)) {
+                    if (second > (60*60)) {
                         stopRecordingVideo();
                         vv.cancel();
                     }

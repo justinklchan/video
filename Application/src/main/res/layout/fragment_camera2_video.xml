@@ -210,6 +210,14 @@
             app:layout_constraintStart_toEndOf="@+id/video"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@+id/preview"
+            app:layout_constraintStart_toEndOf="@+id/rsize"
+            app:layout_constraintTop_toBottomOf="@+id/timer" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 <!--    <View-->
