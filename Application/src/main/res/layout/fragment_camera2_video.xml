@@ -218,6 +218,15 @@
             app:layout_constraintStart_toEndOf="@+id/rsize"
             app:layout_constraintTop_toBottomOf="@+id/timer" />
 
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="flash"
+            android:checked="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 <!--    <View-->

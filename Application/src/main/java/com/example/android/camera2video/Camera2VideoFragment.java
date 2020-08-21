@@ -77,6 +77,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Switch;
@@ -363,7 +364,7 @@ public class Camera2VideoFragment extends Fragment
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         preview = (ImageView)view.findViewById(R.id.preview);
         angleView = (TextView) view.findViewById(R.id.vibe2);
-//        sw1 = (Switch) view.findViewById(R.id.switch1);
+        sw1 = (Switch) view.findViewById(R.id.switch1);
         mButtonVideo = (Button) view.findViewById(R.id.video);
 //        mButtonPic = (Button) view.findViewById(R.id.snap);
         tv1 = (TextView) view.findViewById(R.id.timer);
@@ -374,6 +375,17 @@ public class Camera2VideoFragment extends Fragment
         view.findViewById(R.id.vibe).setOnClickListener(this);
         view.findViewById(R.id.vibe2).setOnClickListener(this);
         view.findViewById(R.id.stop).setOnClickListener(this);
+
+        sw1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                try {
+                    startPreview();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         if (!Settings.System.canWrite(getActivity())) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
@@ -848,12 +860,13 @@ public class Camera2VideoFragment extends Fragment
     }
 
     public void buildRequest() {
-//        if (sw1.isChecked()) {
+        Log.e("out","build request "+sw1.isChecked());
+        if (sw1.isChecked()) {
             mPreviewBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH);
-//        }
-//        else {
-//            mPreviewBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
-//        }
+        }
+        else {
+            mPreviewBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
+        }
         mPreviewBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_CANCEL);
         mPreviewBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
 
@@ -1117,7 +1130,7 @@ public class Camera2VideoFragment extends Fragment
             return;
         }
         try {
-            timer = new CountUpTimer((60*60) * 1000) {
+            timer = new CountUpTimer((60*61) * 1000) {
                 public void onTick(int second) {
 //                    TextView tv9 = .findViewById(R.id.textView9);
                     int raw = Integer.parseInt(String.valueOf(second));
@@ -1132,7 +1145,7 @@ public class Camera2VideoFragment extends Fragment
                     if (tv1!=null) {
                         tv1.setText(tval);
                     }
-                    if (second > (60*60)) {
+                    if (second > (60*60)-1) {
                         stopRecordingVideo();
                         vv.cancel();
                     }
